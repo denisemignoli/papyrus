@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/livros")
@@ -75,5 +76,37 @@ public class Controller {
             }
         }
         return livrosPorAno;
+    }
+
+    @GetMapping("/desatualizados/{ano}")
+    public List<Livro> getDesatualizados(@PathVariable int ano) {
+        List<Livro> desatualizados = new ArrayList<>();
+        for (Livro livro : livros) {
+            if (livro.getAno() < ano) {
+                desatualizados.add(livro);
+            }
+        }
+        return desatualizados;
+    }
+
+    @GetMapping("/especifico")
+    public List<Livro> getLivrosEspecificos(@RequestParam String autor, int ano) {
+        List<Livro> livrosEspecificos = livros.stream()
+                .filter(livro -> livro.getAutor().equals(autor) && livro.getAno() == ano)
+                .toList();
+        return livrosEspecificos;
+    }
+
+    @PutMapping("updateLivro/{id}")
+    public ResponseEntity<Livro> updateLivro(@PathVariable String id, @RequestBody Livro dadosAtualizados) {
+        for (Livro livro : livros) {
+            if (livro.getId().equals(id)) {
+                livro.setTitulo(dadosAtualizados.getTitulo());
+                livro.setAutor(dadosAtualizados.getAutor());
+                livro.setAno(dadosAtualizados.getAno());
+                return ResponseEntity.ok(livro);
+            }
+        }
+        return ResponseEntity.notFound().build();
     }
 }
