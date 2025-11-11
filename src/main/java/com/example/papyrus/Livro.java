@@ -4,9 +4,9 @@ import java.util.UUID;
 
 public class Livro {
     private final String id;
-    private final String titulo;
-    private final String autor;
-    private final int ano;
+    private String titulo;
+    private String autor;
+    private int ano;
 
     public Livro(String titulo, String autor, int ano) {
         this.id = UUID.randomUUID().toString();
@@ -29,5 +29,17 @@ public class Livro {
 
     public String getId() {
         return id;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public void setAutor(String autor) {
+        this.autor = autor;
+    }
+
+    public void setAno(int ano) {
+        this.ano = ano;
     }
 }
