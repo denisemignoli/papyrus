@@ -30,12 +30,30 @@ public class Controller {
     }
 
     @GetMapping("/{id}")
-    public Livro getByID(@PathVariable String id) {
+    public Livro getLivroByID(@PathVariable String id) {
         for (Livro livro : livros) {
             if (livro.getId().equals(id)) {
                 return livro;
             }
         }
         return null;
+    }
+
+    @GetMapping("/titulos")
+    public List<String> getTitulos() {
+        List<String> titulos = new ArrayList<>();
+        for (Livro livro : livros) {
+            titulos.add(livro.getTitulo());
+        }
+        return titulos;
+    }
+
+    @GetMapping("/autores")
+    public List<String> getAutores() {
+        List<String> autoresUnicos = livros.stream()
+                .map(livro -> livro.getAutor())
+                .distinct()
+                .toList();
+        return autoresUnicos;
     }
 }
