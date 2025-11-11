@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,5 +27,15 @@ public class Controller {
     @GetMapping
     public List<Livro> getLivros() {
         return livros;
+    }
+
+    @GetMapping("/{id}")
+    public Livro getByID(@PathVariable String id) {
+        for (Livro livro : livros) {
+            if (livro.getId().equals(id)) {
+                return livro;
+            }
+        }
+        return null;
     }
 }
