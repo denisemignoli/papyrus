@@ -1,15 +1,23 @@
 package com.example.papyrus.model;
 
-import java.util.UUID;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
+@Entity
 public class Livro {
-    private final String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     private String titulo;
     private String autor;
     private int ano;
 
+    protected Livro() {
+    }
+
     public Livro(String titulo, String autor, int ano) {
-        this.id = UUID.randomUUID().toString();
         this.titulo = titulo;
         this.autor = autor;
         this.ano = ano;
@@ -27,7 +35,7 @@ public class Livro {
         return ano;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
