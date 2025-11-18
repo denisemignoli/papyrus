@@ -1,32 +1,28 @@
 package com.example.papyrus.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
-
 import com.example.papyrus.model.Livro;
+import com.example.papyrus.repository.LivroRepository;
 
 @Service
 public class LivroService {
-    private List<Livro> livros;
+    private final LivroRepository livroRepository;
 
-    public LivroService() {
-        livros = new ArrayList<>();
-        livros.add(new Livro("O Senhor dos Anéis", "J.R.R. Tolkien", 1954));
-        livros.add(new Livro("Dom Quixote", "Miguel de Cervantes", 1605));
-        livros.add(new Livro("1984", "George Orwell", 1949));
+    public LivroService(LivroRepository livroRepository) {
+        this.livroRepository = livroRepository;
     }
 
     public Object getTotalDelivros() {
-        return livros.size();
+        return livroRepository.count();
     }
 
     public List<Livro> getLivros() {
-        return livros;
+        return livroRepository.findAll();
     }
 
-    public Livro getLivroByID(String id) {
-        for (Livro livro : livros) {
+    public Livro getLivroByID(long id) {
+        for (Livro livro : livroRepository.findAll()) {
             if (livro.getId().equals(id)) {
                 return livro;
             }
@@ -35,43 +31,48 @@ public class LivroService {
     }
 
     public List<String> findTitulos() {
-        return livros.stream()
+        List<Livro> todosOsLivros = livroRepository.findAll();
+        return todosOsLivros.stream()
                 .map(livro -> livro.getTitulo())
                 .toList();
     }
 
     public List<String> findAutores() {
-        return livros.stream()
+        List<Livro> todosOsLivros = livroRepository.findAll();
+        return todosOsLivros.stream()
                 .map(livro -> livro.getAutor())
                 .distinct()
                 .toList();
     }
 
     public Livro addLivro(Livro novoLivro) {
-        livros.add(novoLivro);
+        livroRepository.save(novoLivro);
         return novoLivro;
     }
 
     public List<Livro> findLivrosPorAno(int ano) {
-        return livros.stream()
+        List<Livro> todosOsLivros = livroRepository.findAll();
+        return todosOsLivros.stream()
                 .filter(livro -> livro.getAno() == ano)
                 .toList();
     }
 
     public List<Livro> findLivrosDesatualizados(int ano) {
-        return livros.stream()
+        List<Livro> todosOsLivros = livroRepository.findAll();
+        return todosOsLivros.stream()
                 .filter(livro -> livro.getAno() < ano)
                 .toList();
     }
 
     public List<Livro> filtrarPorAutorEAno(String autor, int ano) {
-        return livros.stream()
+        List<Livro> todosOsLivros = livroRepository.findAll();
+        return todosOsLivros.stream()
                 .filter(livro -> livro.getAutor().equals(autor) && livro.getAno() == ano)
                 .toList();
     }
 
-    public Livro updateLivro(String id, Livro dadosAtualizados) {
-        for (Livro livro : livros) {
+    public Livro updateLivro(long id, Livro dadosAtualizados) {
+        for (Livro livro : livroRepository.findAll()) {
             if (livro.getId().equals(id)) {
                 livro.setTitulo(dadosAtualizados.getTitulo());
                 livro.setAutor(dadosAtualizados.getAutor());
@@ -82,8 +83,12 @@ public class LivroService {
         return null;
     }
 
-    public boolean deleteLivro(String id) {
-        return livros.removeIf(livro -> livro.getId().equals(id));
+    public boolean deleteLivro(Long id) {
+        if (livroRepository.existsById(id)) {
+            livroRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
 }
