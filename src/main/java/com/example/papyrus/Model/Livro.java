@@ -1,4 +1,4 @@
-package com.example.papyrus.Model;
+package com.example.papyrus.model;
 
 import java.util.UUID;
 

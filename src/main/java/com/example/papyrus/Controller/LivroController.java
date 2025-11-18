@@ -1,4 +1,4 @@
-package com.example.papyrus.Controller;
+package com.example.papyrus.controller;
 
 import java.util.List;
 import java.time.LocalDateTime;
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.papyrus.Model.Livro;
-import com.example.papyrus.Service.Acervo;
+import com.example.papyrus.model.Livro;
+import com.example.papyrus.service.LivroService;
 
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 @RestController
 @RequestMapping("/livros")
 public class LivroController {
-    private Acervo acervo;
+    private LivroService acervo;
 
-    public LivroController(Acervo _acervo) {
+    public LivroController(LivroService _acervo) {
         this.acervo = _acervo;
     }
 

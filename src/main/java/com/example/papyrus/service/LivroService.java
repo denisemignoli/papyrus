@@ -1,16 +1,16 @@
-package com.example.papyrus.Service;
+package com.example.papyrus.service;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-import com.example.papyrus.Model.Livro;
+import com.example.papyrus.model.Livro;
 
 @Service
-public class Acervo {
+public class LivroService {
     private List<Livro> livros;
 
-    public Acervo() {
+    public LivroService() {
         livros = new ArrayList<>();
         livros.add(new Livro("O Senhor dos Anéis", "J.R.R. Tolkien", 1954));
         livros.add(new Livro("Dom Quixote", "Miguel de Cervantes", 1605));
