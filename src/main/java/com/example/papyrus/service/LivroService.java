@@ -1,6 +1,8 @@
 package com.example.papyrus.service;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import com.example.papyrus.model.Livro;
 import com.example.papyrus.repository.LivroRepository;
@@ -13,7 +15,7 @@ public class LivroService {
         this.livroRepository = livroRepository;
     }
 
-    public Object getTotalDelivros() {
+    public long getTotalDelivros() {
         return livroRepository.count();
     }
 
@@ -21,66 +23,59 @@ public class LivroService {
         return livroRepository.findAll();
     }
 
-    public Livro getLivroByID(long id) {
-        for (Livro livro : livroRepository.findAll()) {
-            if (livro.getId().equals(id)) {
-                return livro;
-            }
-        }
-        return null;
+    public Optional<Livro> getLivroByID(Long id) {
+        return livroRepository.findById(id);
     }
 
     public List<String> findTitulos() {
-        List<Livro> todosOsLivros = livroRepository.findAll();
-        return todosOsLivros.stream()
-                .map(livro -> livro.getTitulo())
+        return livroRepository.findAll().stream()
+                .map(Livro::getTitulo)
                 .toList();
     }
 
     public List<String> findAutores() {
-        List<Livro> todosOsLivros = livroRepository.findAll();
-        return todosOsLivros.stream()
-                .map(livro -> livro.getAutor())
+        return livroRepository.findAll().stream()
+                .map(Livro::getAutor)
                 .distinct()
                 .toList();
     }
 
     public Livro addLivro(Livro novoLivro) {
-        livroRepository.save(novoLivro);
-        return novoLivro;
+        return livroRepository.save(novoLivro);
     }
 
     public List<Livro> findLivrosPorAno(int ano) {
-        List<Livro> todosOsLivros = livroRepository.findAll();
-        return todosOsLivros.stream()
+        return livroRepository.findAll().stream()
                 .filter(livro -> livro.getAno() == ano)
                 .toList();
     }
 
     public List<Livro> findLivrosDesatualizados(int ano) {
-        List<Livro> todosOsLivros = livroRepository.findAll();
-        return todosOsLivros.stream()
+        return livroRepository.findAll().stream()
                 .filter(livro -> livro.getAno() < ano)
                 .toList();
     }
 
     public List<Livro> filtrarPorAutorEAno(String autor, int ano) {
-        List<Livro> todosOsLivros = livroRepository.findAll();
-        return todosOsLivros.stream()
+        return livroRepository.findAll().stream()
                 .filter(livro -> livro.getAutor().equals(autor) && livro.getAno() == ano)
                 .toList();
     }
 
-    public Livro updateLivro(long id, Livro dadosAtualizados) {
-        for (Livro livro : livroRepository.findAll()) {
-            if (livro.getId().equals(id)) {
-                livro.setTitulo(dadosAtualizados.getTitulo());
-                livro.setAutor(dadosAtualizados.getAutor());
-                livro.setAno(dadosAtualizados.getAno());
-                return livro;
-            }
+    public Livro updateLivro(Long id, Livro dadosAtualizados) {
+        Optional<Livro> livroOpt = livroRepository.findById(id);
+
+        if (livroOpt.isEmpty()) {
+            return null;
         }
-        return null;
+
+        Livro livroExistente = livroOpt.get();
+
+        livroExistente.setTitulo(dadosAtualizados.getTitulo());
+        livroExistente.setAutor(dadosAtualizados.getAutor());
+        livroExistente.setAno(dadosAtualizados.getAno());
+
+        return livroRepository.save(livroExistente);
     }
 
     public boolean deleteLivro(Long id) {

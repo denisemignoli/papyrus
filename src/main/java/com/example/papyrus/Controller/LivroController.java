@@ -3,6 +3,7 @@ package com.example.papyrus.controller;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +24,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 @RestController
 @RequestMapping("/livros")
 public class LivroController {
-    private LivroService acervo;
+    private final LivroService livroService;
 
-    public LivroController(LivroService _acervo) {
-        this.acervo = _acervo;
+    public LivroController(LivroService livroService) {
+        this.livroService = livroService;
     }
 
     @GetMapping("/status")
@@ -34,20 +35,21 @@ public class LivroController {
         Map<String, Object> response = Map.of(
                 "mensagem", "Seja bem-vindo ao Papyrus!",
                 "timestamp", LocalDateTime.now(),
-                "totalLivros", acervo.getTotalDelivros());
+                "totalLivros", livroService.getTotalDelivros());
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
     public List<Livro> getLivros() {
-        return acervo.getLivros();
+        return livroService.getLivros();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Livro> getLivroByID(@PathVariable String id) {
-        Livro livroEncontrado = acervo.getLivroByID(id);
-        if (livroEncontrado != null) {
-            return ResponseEntity.ok(livroEncontrado);
+    public ResponseEntity<Livro> getLivroByID(@PathVariable Long id) {
+        Optional<Livro> livroOpt = livroService.getLivroByID(id);
+
+        if (livroOpt.isPresent()) {
+            return ResponseEntity.ok(livroOpt.get());
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -55,7 +57,7 @@ public class LivroController {
 
     @GetMapping("/titulos")
     public ResponseEntity<List<String>> getTitulos() {
-        List<String> titulos = acervo.findTitulos();
+        List<String> titulos = livroService.findTitulos();
         if (titulos.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -64,19 +66,19 @@ public class LivroController {
 
     @GetMapping("/autores")
     public List<String> getAutores() {
-        List<String> autoresUnicos = acervo.findAutores();
+        List<String> autoresUnicos = livroService.findAutores();
         return autoresUnicos;
     }
 
     @PostMapping
     public ResponseEntity<Livro> criarLivro(@RequestBody Livro novoLivro) {
-        Livro livroCriado = acervo.addLivro(novoLivro);
+        Livro livroCriado = livroService.addLivro(novoLivro);
         return ResponseEntity.status(HttpStatus.CREATED).body(livroCriado);
     }
 
     @GetMapping("/por-ano/{ano}")
     public ResponseEntity<List<Livro>> getLivrosPorAno(@PathVariable int ano) {
-        List<Livro> livrosPorAno = acervo.findLivrosPorAno(ano);
+        List<Livro> livrosPorAno = livroService.findLivrosPorAno(ano);
         if (livrosPorAno.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -85,7 +87,7 @@ public class LivroController {
 
     @GetMapping("/desatualizados/{ano}")
     public ResponseEntity<List<Livro>> getLivrosDesatualizados(@PathVariable int ano) {
-        List<Livro> anteriores = acervo.findLivrosDesatualizados(ano);
+        List<Livro> anteriores = livroService.findLivrosDesatualizados(ano);
         if (anteriores.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -94,7 +96,7 @@ public class LivroController {
 
     @GetMapping("/filtrar")
     public ResponseEntity<List<Livro>> filtrarPorAutorEAno(@RequestParam String autor, @RequestParam int ano) {
-        List<Livro> filtrados = acervo.filtrarPorAutorEAno(autor, ano);
+        List<Livro> filtrados = livroService.filtrarPorAutorEAno(autor, ano);
         if (filtrados.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -102,8 +104,8 @@ public class LivroController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Livro> atualizarLivro(@PathVariable String id, @RequestBody Livro dadosAtualizados) {
-        Livro livroAtualizado = acervo.updateLivro(id, dadosAtualizados);
+    public ResponseEntity<Livro> atualizarLivro(@PathVariable long id, @RequestBody Livro dadosAtualizados) {
+        Livro livroAtualizado = livroService.updateLivro(id, dadosAtualizados);
         if (livroAtualizado != null) {
             return ResponseEntity.ok(livroAtualizado);
         }
@@ -111,8 +113,8 @@ public class LivroController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarLivro(@PathVariable String id) {
-        boolean removido = acervo.deleteLivro(id);
+    public ResponseEntity<Void> deletarLivro(@PathVariable long id) {
+        boolean removido = livroService.deleteLivro(id);
         if (removido) {
             return ResponseEntity.noContent().build();
         }
